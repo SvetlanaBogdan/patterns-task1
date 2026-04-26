@@ -42,8 +42,9 @@ public class CardDeliveryTest {
                 .click();
 
 
-        $(".notification__content")
+        $(".notification")
                 .shouldBe(visible, Duration.ofSeconds(15))
+                .$(".notification__content")
                 .shouldHave(text("Встреча успешно запланирована на " + firstDate));
     }
 }
