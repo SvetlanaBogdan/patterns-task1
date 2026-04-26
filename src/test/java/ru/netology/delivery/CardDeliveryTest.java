@@ -15,8 +15,8 @@ public class CardDeliveryTest {
 
     @BeforeAll
     static void setup() {
-        Configuration.headless = false; // чтобы видеть браузер
         Configuration.baseUrl = "http://localhost:9999";
+        // ❌ headless НЕ задаём — он придёт из CI
     }
 
     @Test
@@ -24,12 +24,12 @@ public class CardDeliveryTest {
 
         open("/");
 
-        // один пользователь (по ДЗ обязательно)
+        // один пользователь
         var user = DataGenerator.generateUser();
 
         String firstDate = DataGenerator.generateDate(3);
 
-        // Первая отправка
+        // --- первая отправка ---
         $("[data-test-id='city'] input").setValue(user.getCity());
 
         $("[data-test-id='date'] input")
@@ -40,22 +40,29 @@ public class CardDeliveryTest {
         $("[data-test-id='phone'] input").setValue(user.getPhone());
 
         $("[data-test-id='agreement']").click();
-        $$("button.button").findBy(text("Запланировать")).click();
+
+        // 👇 ВАЖНО: кликаем по тексту кнопки
+        $$("button.button")
+                .findBy(text("Запланировать"))
+                .click();
+
         // проверка успеха
         $("[data-test-id='success-notification']")
                 .shouldBe(visible, Duration.ofSeconds(15))
                 .shouldHave(text("Встреча успешно запланирована на " + firstDate));
 
-        // Меняем только дату
+        // --- меняем только дату ---
         String secondDate = DataGenerator.generateDate(4);
 
         $("[data-test-id='date'] input")
                 .doubleClick()
                 .sendKeys(secondDate);
 
-        $$("button.button").findBy(text("Запланировать")).click();
+        $$("button.button")
+                .findBy(text("Запланировать"))
+                .click();
 
-        // Всплывающее окно подтверждения
+        // --- попап подтверждения ---
         $("[data-test-id='replan-notification']")
                 .shouldBe(visible, Duration.ofSeconds(15))
                 .shouldHave(text("Необходимо подтверждение"));
@@ -66,7 +73,7 @@ public class CardDeliveryTest {
                 .shouldBe(visible, Duration.ofSeconds(15))
                 .click();
 
-        // Финальный результат с перепланированием
+        // --- финальный успех ---
         $("[data-test-id='success-notification']")
                 .shouldBe(visible, Duration.ofSeconds(15))
                 .shouldHave(text("Встреча успешно запланирована на " + secondDate));
