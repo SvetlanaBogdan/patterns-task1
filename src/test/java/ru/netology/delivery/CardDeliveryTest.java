@@ -16,7 +16,7 @@ public class CardDeliveryTest {
     @BeforeAll
     static void setup() {
         Configuration.baseUrl = "http://localhost:9999";
-        // ❌ headless НЕ задаём — он придёт из CI
+        //headless НЕ задаём — он придёт из CI
     }
 
     @Test
@@ -24,12 +24,12 @@ public class CardDeliveryTest {
 
         open("/");
 
-        // один пользователь
+
         var user = DataGenerator.generateUser();
 
         String firstDate = DataGenerator.generateDate(3);
 
-        // --- первая отправка ---
+
         $("[data-test-id='city'] input").setValue(user.getCity());
 
         $("[data-test-id='date'] input")
@@ -41,17 +41,17 @@ public class CardDeliveryTest {
 
         $("[data-test-id='agreement']").click();
 
-        // 👇 ВАЖНО: кликаем по тексту кнопки
+
         $$("button.button")
                 .findBy(text("Запланировать"))
                 .click();
 
-        // проверка успеха
+
         $("[data-test-id='success-notification']")
                 .shouldBe(visible, Duration.ofSeconds(15))
                 .shouldHave(text("Встреча успешно запланирована на " + firstDate));
 
-        // --- меняем только дату ---
+        //
         String secondDate = DataGenerator.generateDate(4);
 
         $("[data-test-id='date'] input")
@@ -62,18 +62,18 @@ public class CardDeliveryTest {
                 .findBy(text("Запланировать"))
                 .click();
 
-        // --- попап подтверждения ---
+
         $("[data-test-id='replan-notification']")
                 .shouldBe(visible, Duration.ofSeconds(15))
                 .shouldHave(text("Необходимо подтверждение"));
 
-        // кнопка "Перепланировать"
+
         $$("button.button")
                 .findBy(text("Перепланировать"))
                 .shouldBe(visible, Duration.ofSeconds(15))
                 .click();
 
-        // --- финальный успех ---
+
         $("[data-test-id='success-notification']")
                 .shouldBe(visible, Duration.ofSeconds(15))
                 .shouldHave(text("Встреча успешно запланирована на " + secondDate));
