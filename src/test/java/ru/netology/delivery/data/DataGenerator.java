@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class DataGenerator {
+    private DataGenerator() {}
 
     private static Faker faker = new Faker(new Locale("ru"));
 
@@ -19,7 +20,7 @@ public class DataGenerator {
         return new UserInfo(
                 faker.address().city(),
                 faker.name().fullName(),
-                "+7" + faker.number().digits(10) // 🔥 ВОТ ЗДЕСЬ
+                "+7" + faker.number().digits(10)
         );
     }
 }
