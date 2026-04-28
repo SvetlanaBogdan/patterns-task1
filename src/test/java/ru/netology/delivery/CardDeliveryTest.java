@@ -20,31 +20,55 @@ public class CardDeliveryTest {
     }
 
     @Test
-    void shouldReplanMeetingWithConfirmation() {
-
+    void shouldReplanMeeting() {
         open("/");
+
         var user = DataGenerator.generateUser();
         String firstDate = DataGenerator.generateDate(3);
+        String secondDate = DataGenerator.generateDate(5);
 
+        // ввод города
         $("[data-test-id='city'] input").setValue(user.getCity());
 
+        // первая дата
         $("[data-test-id='date'] input")
                 .doubleClick()
                 .sendKeys(firstDate);
 
+        // имя и телефон
         $("[data-test-id='name'] input").setValue(user.getName());
         $("[data-test-id='phone'] input").setValue(user.getPhone());
 
+        // согласие
         $("[data-test-id='agreement']").click();
+
+        // кнопка запланировать
+        $$("button.button")
+                .findBy(text("Запланировать"))
+                .click();
+
+        // проверка первой даты
+        $(".notification")
+                .shouldBe(visible, Duration.ofSeconds(15))
+                .shouldHave(text("Встреча успешно запланирована на " + firstDate));
+
+        // ВТОРАЯ ДАТА (перепланирование)
+        $("[data-test-id='date'] input")
+                .doubleClick()
+                .sendKeys(secondDate);
 
         $$("button.button")
                 .findBy(text("Запланировать"))
                 .click();
 
+        // кнопка перепланировать
+        $$("button.button")
+                .findBy(text("Перепланировать"))
+                .click();
 
+        // проверка второй даты
         $(".notification")
                 .shouldBe(visible, Duration.ofSeconds(15))
-                .$(".notification__content")
-                .shouldHave(text("Встреча успешно запланирована на " + firstDate));
+                .shouldHave(text("Встреча успешно запланирована на " + secondDate));
     }
 }
